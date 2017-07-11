@@ -1,8 +1,10 @@
-﻿///zambari codes unity
+﻿#define SIMPLECONSOLE
+
+///zambari codes unity
 
 //  An extension of
 //  UnityOSC -   Copyright (c) 2012 Jorge Garcia Martin
-//  base classes slightly modified, some wrappers added by Zambari // Stereoko.TV
+//  base classes slightly modified, some wrappers added by zambari // Stereoko.TV
 
 using UnityEngine;
 
@@ -57,11 +59,19 @@ replies with full hierarchy so
 // if youre using zSettingss, otherwise safe to remove
 public class zOSC : MonoBehaviour
 {
+    [Header("Reciever@localhost")]
+    public int defaultRecievePort = 8899;
+    [Header("Sender")]
+    public string targetAddr="127.0.0.1";
+    public int targetPort=9988;
+
+
     public const string returnAddress = "/_?";
     public const string query = "?";
-    public int defaultRecievePort = 8899;
+
+
     public bool localEcho = true;
-    ClientLog reciever;
+  //  ClientLog reciever;
     ServerLog localListener;
     int listenPort = 9988;
     List<ClientLog> OSCRecievers;
@@ -69,6 +79,9 @@ public class zOSC : MonoBehaviour
     bool logSends = true;
     public static bool logRecieve = true;
     public static bool started = false;
+
+    
+    public bool logToConsole;
 
     OSCClient client;
     [Header("Stats")]
@@ -78,13 +91,8 @@ public class zOSC : MonoBehaviour
     public int TotalPacketsSent;
     public int TotalPacketsRecieved;
     static bool warningDisplated;
-    public static zOSC instance
-    {
-        get
-        {
-            return _instance;
-        }
-    }
+        bool recieverIsLocal;
+ 
     List<OSCPacket> recievePacketQueue;
 
     // List<AckRequest> sentAckRequests;
@@ -95,12 +103,21 @@ public class zOSC : MonoBehaviour
     public static Action OnOSCTransmit;
     public static OSCPacket lastRecieved;
     public static OSCMessage lastSent;
-    static int ackRequestCounter;
+  //  static int ackRequestCounter;
     public static OSCRouter get;
    // public static OSCRouter replyRouter;
-    public List<string> bindAddresses;
+   // public List<string> bindAddresses;
     public List<string> routerList;
+    
 
+
+   public static zOSC instance
+    {
+        get
+        {
+            return _instance;
+        }
+    }
     public static string sanitizeAddress(string source)
     {
         if (String.IsNullOrEmpty(source)) return "/none";
@@ -115,11 +132,21 @@ public class zOSC : MonoBehaviour
 
         }
         if (newAddress.Length==1) newAddress+="none";
-return newAddress;
+        return newAddress;
 
     }
-    bool recieverIsLocal;
 
+
+static void log(string s)
+{
+
+#if SIMPLECONSOLE
+       SimpleConsole.Log(s);
+    
+#endif
+
+
+}
 
     public static string makeQuery(string inp)
     {
@@ -193,6 +220,7 @@ return newAddress;
 /// Contains incoming packet parsing ruleset
 /// </summary>
 /// <param name="packet"></param>
+    
     void reactToPacket(OSCPacket packet) 
     {
         lastRecieved = packet;
@@ -204,7 +232,7 @@ return newAddress;
 
         _instance.TotalBytesRecieved += packet.BinaryData.Length;
         _instance.TotalPacketsRecieved++;
-
+       
         // LIST BIND REQUESTES BEGIN    
             //   instance.listBindAdresses(address);
         // LIST BIND REQUESTES END
@@ -220,6 +248,7 @@ return newAddress;
 
         bool anyReacted = false;
 
+        if (logToConsole) log("RCV:"+packet.Address);
         int i = 0;
 
         if (packet.Address[packet.Address.Length-1]=='?')
@@ -400,10 +429,11 @@ return newAddress;
       
         if (_instance.client != null)
         {
-            if (OnOSCTransmit != null) OnOSCTransmit();
+        if (_instance.logToConsole) log("SND:"+message.Address);
             _instance.client.Send(message);
             _instance.TotalBytesSent += message.BinaryData.Length; // stats
             _instance.TotalPacketsSent++;                          // stats
+                if (OnOSCTransmit != null) OnOSCTransmit();
         }
         else Debug.Log("no client " + message.Address);
          try{
@@ -412,7 +442,7 @@ return newAddress;
               if (!_instance.recieverIsLocal)
                    _instance.reactToPacket(message);                   // dogfeeding our message
              }
-             if (_instance.logSends && zLog.instance!=null ) zLog.Log("- > " + message.AsString());
+             if (_instance.logSends && zLog.instance!=null ) log("- > " + message.AsString());
                    return true;
         } catch (Exception e) {
              Debug.Log("Error broadcasting OSC to local listenerd (not through network!) "+e.Message);
@@ -504,12 +534,12 @@ return newAddress;
     #endregion broadcastOverload
 
     public static bool SetReciever(string addr, int portNr)
-    {
+    { 
         if (_instance.client != null) _instance.client.Close();
         _instance.client = new OSCClient(IPAddress.Parse(addr), portNr);
         if (_instance.client == null)
         {
-            zLog.Log("OSC port open failed  : " + addr + " : " + portNr);
+            log("OSC port open failed  : " + addr + " : " + portNr);
             return false;
         }
         if (addr == "127.0.0.1" && portNr == instance.listenPort)
@@ -519,7 +549,10 @@ return newAddress;
 
             _instance.recieverIsLocal = false;
 
-        if (logRecieve) zLog.Log("OSC recieving : " + addr + " : " + portNr);
+        if (logRecieve) log("OSC recieving : " + addr + " : " + portNr);
+      
+      _instance.targetAddr=addr;
+      _instance.targetPort=portNr;
         return true;
 
     }
@@ -561,16 +594,17 @@ return newAddress;
             localListener.server.PacketReceivedEvent += newOScPacket;
 
             started = true;
+            Debug.Log("started listenning at port "+listenPort);
         }
         catch (Exception e)
         {
-            Debug.Log("local port failed " + e.Message);
+            Debug.Log("local port "+listenPort+" failed " + e.Message);
             return false;
         }
 
         if (OSCHandler.Instance.Servers.ContainsKey("LocalHost"))
         {
-            if (logRecieve) zLog.Log("localhost open running on port : " + OSCHandler.Instance.Servers["LocalHost"].server.LocalPort);
+            if (logRecieve) log("localhost open running on port : " + OSCHandler.Instance.Servers["LocalHost"].server.LocalPort);
             Debug.Log("localhost open running on port : " + OSCHandler.Instance.Servers["LocalHost"].server.LocalPort);
         }
 
@@ -607,7 +641,8 @@ return newAddress;
 
     void Start()
     {
-        SetReciever("127.0.0.1", listenPort);
+          if (!string.IsNullOrEmpty(targetAddr)) SetReciever(targetAddr,targetPort);
+       // SetReciever("127.0.0.1", listenPort);
     }
 
     void Update()
@@ -619,7 +654,6 @@ return newAddress;
         }
 
     }
-
     void Awake()
     {
         pendingAcks = new List<int>();
@@ -631,7 +665,7 @@ return newAddress;
 
         recievePacketQueue = new List<OSCPacket>();
         setLocalPort(defaultRecievePort);
-
+      
     }
 
 
