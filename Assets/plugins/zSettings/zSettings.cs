@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 
 public class zSettings : zNodeController
-{
+{ 
     public static zSettings instance;
     [HideInInspector]
     public SettingsTab activeTab;
@@ -44,7 +44,7 @@ public class zSettings : zNodeController
         newTabButton.transform.SetAsFirstSibling();
         SettingsTab thisTab = newTabButton.GetComponent<SettingsTab>();
         thisTab.setLabel(tabName);
-        GameObject newTabContent = Instantiate(content.gameObject, templatePoolGO.transform.parent);
+        GameObject newTabContent = Instantiate(setup.content.gameObject, setup.templatePoolGO.transform.parent);
         for (int i = newTabContent.transform.childCount - 1; i >= 0; i--)
             Destroy(newTabContent.transform.GetChild(i).gameObject); // we need to make sure new tab is empty unfortunately
         newTabContent.SetActive(true);
@@ -110,8 +110,8 @@ public class zSettings : zNodeController
     protected override void OnValidate()
     {
         base.OnValidate();
-        if (tabTemplate == null)
-            tabTemplate = GetComponentInChildren<SettingsTab>();
+        if (tabTemplate==null) 
+            tabTemplate=GetComponentInChildren<SettingsTab>();
         if (autoSaveToggle == null)
         {
             var t = transform.Find("SaveSettingsToggle");
@@ -121,30 +121,16 @@ public class zSettings : zNodeController
                 if (autoSaveToggle == null) autoSaveToggle.isOn = autoSave;
             }
         }
-        if (headerLayoutElement != null)
+        if (headerLayoutElement!=null)
         {
-            headerLayoutElement.preferredHeight = headerHeight;
-            headerLayoutElement.minHeight = headerHeight;
+            headerLayoutElement.preferredHeight=headerHeight;
+            headerLayoutElement.minHeight=headerHeight;
         }
-       if (nodeTemplatePool!=null&&nodeTemplatePool.Count>1)
-             templatePoolGO=nodeTemplatePool[1].transform.parent.gameObject;
-        if (templatePoolGO != null && templatePoolGO.transform != null && templatePoolGO.transform.parent != null)
-        {
-            content = templatePoolGO.transform.parent.GetComponent<RectTransform>();
-            if (content != null)
-            {
-                var r = content.GetComponentInParent<Mask>();
-                if (r != null) contentMaskRect = r.GetComponent<RectTransform>();
-            }
-
-
-        }
-
     }
     public override void setHeight(float f)
     {
         base.setHeight(f);
-        RectTransform tabRecttab = tabTemplate.transform.parent.GetComponent<RectTransform>();
+       RectTransform tabRecttab = tabTemplate.transform.parent.GetComponent<RectTransform>();
         if (tabHeights == 0) tabHeights = tabRecttab.sizeDelta.y;
         tabRecttab.sizeDelta = new Vector2(tabRecttab.sizeDelta.x, f * 1.6f); //tabHeights
         setHeaderHeight(2 * f);
@@ -182,7 +168,7 @@ public class zSettings : zNodeController
         else
         {
             SettingsTab thisTab = getTab(tabName);
-            if (prefab == null) Debug.Log("error finding prefab " + nodeType);
+            if (prefab==null) Debug.Log("error finding prefab "+nodeType);
             thisSetting = Instantiate(prefab, prefab.transform.parent);
             thisSetting.gameObject.SetActive(true);
             thisSetting.Init();
@@ -238,51 +224,48 @@ public class zSettings : zNodeController
     }
     protected override void Awake()
     {
-
+       // it pretty much duplicates NodeController but theres subtle difference in ordering
         nodes = new List<zNode>();
-        image = GetComponent<Image>();
+        setup.image = GetComponent<Image>();
         canvas = GetComponentInParent<Canvas>();
+    
         rect = GetComponent<RectTransform>();
         createTemplateDictionary();
 
-        if (templatePoolGO != null)
-        {
-            GameObject contentGO = Instantiate(templatePoolGO, templatePoolGO.transform.parent);
-            content = contentGO.GetComponent<RectTransform>();
-            for (int i = content.transform.childCount - 1; i >= 0; i--)
-                DestroyImmediate(content.transform.GetChild(i).gameObject);
-            content.name = "CONTENT";
+        if (setup.templatePoolGO!=null){
+        GameObject contentGO = Instantiate(setup.templatePoolGO, setup.templatePoolGO.transform.parent);
+        setup.content = contentGO.GetComponent<RectTransform>();
+        for (int i = setup.content.transform.childCount - 1; i >= 0; i--)
+            DestroyImmediate(setup.content.transform.GetChild(i).gameObject);
+        setup.content.name = "CONTENT";
+     
+        Mask m = setup.content.GetComponentInParent<Mask>();
+        if (m == null) Debug.Log("no mask");
+        else
+            setup.contentMaskRect = m.GetComponent<RectTransform>();
+              setup.templatePoolGO.SetActive(false);
+           } else Debug.Log("no template pool");
 
-
-            Mask m = content.GetComponentInParent<Mask>();
-            if (m == null) Debug.Log("no mask");
-            else
-            {
-                contentMaskRect = m.GetComponent<RectTransform>();
-
-            }
-            templatePoolGO.SetActive(false);
-        }
-        else Debug.Log("no template pool");
-
+   
+      
 
         checkIfAwake();
-        scrollRect.viewport = contentMaskRect;
-        scrollRect.verticalScrollbar.direction = Scrollbar.Direction.BottomToTop;
-        scrollRect.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+        scrollRect.viewport=setup.contentMaskRect;
+        scrollRect.verticalScrollbar.direction=Scrollbar.Direction.BottomToTop;
+        scrollRect.verticalScrollbarVisibility=ScrollRect.ScrollbarVisibility.AutoHide;
         settingElements = new List<SettingsElement>();
         elementDict = new Dictionary<string, SettingsElement>();
         lastAdded = new List<SettingsElement>();
         started = true;
         if (tabTemplate != null) tabTemplate.gameObject.SetActive(false);
-        //        if (nodeTemplatePool[0].name.Equals("{Tab}")) Debug.LogWarning("settings should not have TABS at the first entry of the nodetemplate list!", nodeTemplatePool[0].gameObject);
+//        if (setup.setup.setup.setup.nodeTemplatePool[0].name.Equals("{Tab}")) Debug.LogWarning("settings should not have TABS at the first entry of the nodetemplate list!", setup.setup.setup.setup.setup.nodeTemplatePool[0].gameObject);
 
     }
     public void newActiveContent(GameObject t)
     {
-        content = t.GetComponent<RectTransform>();
-        scrollRect.content = content;
-        //        setScrollStateDirty();
+        setup.content = t.GetComponent<RectTransform>();
+        scrollRect.content=setup.content;
+//        setScrollStateDirty();
     }
 
     void loadLast()

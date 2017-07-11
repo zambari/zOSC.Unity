@@ -24,15 +24,13 @@ public class SettingsText : SettingsTextBase
        
     }
 
-    protected override void OnValidate()
+    protected   void OnValidate()
     {
-        base.OnValidate();
              if (inputField==null) inputField=GetComponentInChildren<InputField>();
     }
-    protected override void Awake()
+    protected  void Awake()
 
     {
-        base.Awake();
      //   presetButtons = new List<GameObject>();
 
         layoutEl = GetComponentInChildren<LayoutElement>();

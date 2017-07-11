@@ -38,9 +38,8 @@ public class SettingsSlider : SettingsElement
 
 
     }
-    protected override void OnValidate()
+    protected   void OnValidate()
     {
-        base.OnValidate();
 
         if (slider == null) GetComponentInChildren<Slider>();
         if (inputField == null) inputField = GetComponentInChildren<InputField>();

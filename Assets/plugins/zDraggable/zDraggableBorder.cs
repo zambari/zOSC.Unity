@@ -3,8 +3,12 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Z;
+namespace Z
+{
 
 [RequireComponent(typeof(Image))]
+[AddComponentMenu("")]
 public class zDraggableBorder : zDragResizeRect {
     [SerializeField]
 
@@ -18,17 +22,17 @@ public class zDraggableBorder : zDragResizeRect {
 
     public override void OnDrag(PointerEventData eventData)
     {
-         base.OnDrag(eventData);
+       //  base.OnDrag(eventData);
          draggable.OnDragOperation();
     }
      public override void OnBeginDrag(PointerEventData eventData)
     {
-         base.OnBeginDrag(eventData);
+      //   base.OnBeginDrag(eventData);
          draggable.OnDragOperationStart();
     }
      public override void OnEndDrag(PointerEventData eventData)
     {
-         base.OnEndDrag(eventData);
+       //  base.OnEndDrag(eventData);
          draggable.OnDragOperationEnded();
     }
 
@@ -49,4 +53,5 @@ public class zDraggableBorder : zDragResizeRect {
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
     }
   
+}
 }

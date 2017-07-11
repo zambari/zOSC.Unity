@@ -23,9 +23,8 @@ public class SettingsToggle : SettingsElement {
 
     }
 
-    protected override void OnValidate()
+    protected  void OnValidate()
     {
-        base.OnValidate();
         if (slider==null) slider=GetComponentInChildren<Slider>();
 
 

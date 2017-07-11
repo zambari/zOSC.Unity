@@ -2,10 +2,10 @@
 
 using UnityEngine;
 using UnityEngine.UI;
-//using UnityEngine.UI.Extensions;
-//using System.Collections;
-//using System.Collections.Generic;
+using Z;
+namespace Z {
 [ExecuteInEditMode]
+[AddComponentMenu("")]
 public class zDraggableNameHelper : MonoBehaviour {
 
 	[SerializeField]
@@ -40,4 +40,5 @@ void setName()
 
 }
 
+}
 }

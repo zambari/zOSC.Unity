@@ -65,6 +65,8 @@ public struct TimeRamp
     bool _hasPending;
     Action _callbackOne;
     Action _callbackZero;
+    public Action onZero ;
+     public Action onOne ;
     public bool triggerCallbacksOnDirectionChange;
     public float duration;
 
@@ -146,8 +148,10 @@ public struct TimeRamp
         {
             if (forceRunning)
             {
-             //   if (rampState == RampState.reachedOne && _hasCallbackOne) _callbackOne();
-              //  if (rampState == RampState.reachedZero && _hasCallbackZero) _callbackZero();
+              if (rampState == RampState.reachedOne && _hasCallbackOne) _callbackOne();
+              if (rampState == RampState.reachedZero && _hasCallbackZero) _callbackZero();
+                 if (rampState == RampState.reachedOne && onOne!=null) onOne();
+              if (rampState == RampState.reachedZero && onZero!=null) onZero();
                 forceRunning = false;
             }
             if (_hasPending)
@@ -192,7 +196,7 @@ public struct TimeRamp
                             return 1;
                         }
                         else
-                        {
+                        {if (onOne!=null) onOne();
                             StartFromOne();
                             return 1;
                         }
@@ -215,7 +219,7 @@ public struct TimeRamp
                             return 0;
                         }
                         else
-                        {
+                        {  if (onZero!=null) onZero();
                             StartFromZero();
                             return 0;
                         }

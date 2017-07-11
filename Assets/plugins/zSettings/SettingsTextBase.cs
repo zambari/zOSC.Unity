@@ -154,8 +154,5 @@ public class SettingsTextBase : SettingsElement
         PlayerPrefs.SetString(getID(),value);
                 
     }
-    protected override void Awake()
-    {
-        base.Awake();
-    }
+
 }

@@ -1,11 +1,8 @@
 ﻿//z2k17
 
 using UnityEngine;
-//using UnityEngine.UI;
-//using UnityEngine.UI.Extensions;
-//using System.Collections;
-//using System.Collections.Generic;
 
+namespace Z {
 public class zResourceLoader : MonoBehaviour
 {
 
@@ -96,4 +93,5 @@ public class zResourceLoader : MonoBehaviour
         if (_lineV == null) _lineV = Resources.Load<Sprite>("lineV") as Sprite;
  
     }
+}
 }

@@ -14,7 +14,7 @@ public string value
 }
 
 	
-    protected override void OnValidate()
+    protected  void OnValidate()
     {
 
         setColor();
@@ -23,9 +23,7 @@ public string value
  
     public override void setColor()
     {
-
         
-        if (image == null) image = GetComponentInChildren<Image>();
         if (image != null )
 
                 image.color = labelBGColor;

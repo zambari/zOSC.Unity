@@ -3,26 +3,30 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
+using Z;
+
 
 [ExecuteInEditMode]
 
 public class zDraggable : MonoBehaviour,IProvideColors
 {
+public void colorsChanged()
+{
+    
+}
+    const bool addMenu=false;
     public bool refresh = true;
     [Header("Config")]
     [Range(1, 16)]
     public float borderWidth = 6;
     [Range(1, 16)]
-    public float headerHeight = 12;
+    public float headerHeight = 8;
     public bool stretchSidesToTop = true;
     public bool useCorners = true;
     public bool useLineGraphics = false;
-    //protected static Color _hoverColor;
-
     public Action folding; // not used in this version
     public Action unFolding; // not used in this version
     public Action folded; // not used in this version
-    public bool transparentHeader;
     public bool loadFromPreferencesOnStart;
     [HideInInspector]
     public Vector3[] corners;
@@ -31,7 +35,6 @@ public class zDraggable : MonoBehaviour,IProvideColors
     Image image;
     [SerializeField]
     [HideInInspector]
-
 
     zDraggableMenuController menuController;
     public enum AnchorModes { min, max, stretch };//,noSnap 
@@ -43,7 +46,6 @@ public class zDraggable : MonoBehaviour,IProvideColors
     [SerializeField]
     [HideInInspector]
     public RectTransform rect;
-    const float minWidth = 60;
 
     [SerializeField]
     [HideInInspector]
@@ -66,35 +68,24 @@ public class zDraggable : MonoBehaviour,IProvideColors
     GameObject frame;
     [SerializeField]
     [HideInInspector]
-
     RectTransform[] borderRects;
     [SerializeField]
     [HideInInspector]
     zDraggableBorder[] borders;
-
     public zDraggableBorder.Borders hoverState;
 
-  
     public static List<zDraggable> draggableList;
     [SerializeField]
     protected static GameObject draggableMenu;
     // [SerializeField]
     // protected static GameObject draggableLabel;
     public static Action<zDraggable> newPanel;
-    #region colors
-    [Header ("Color Provide")]
-       Action colorsChanged;
+    public HoverableColors colors;
+  
 
-    public Color normalColor = new Color(1, 1, 1, 0.2f);
-    public Color hoveredColor =new  Color(1, .5f, .1f, 0.2f);
+    public HoverableColors getColors()  {  return colors;  }
 
-   
-    public Action getColorsChangedAction()    {  return colorsChanged;  }
-    public Color getNormalColor()    {   return normalColor;   }
-    public Color getHoveredColor()    {  return hoveredColor;   }
-    public Color getActiveColor()    {    return hoveredColor;  }
-    public Color getdisabledColor()    {    return normalColor;   }
-    #endregion colors
+    public void updateColors(){}
     public void setHoverState(zDraggableBorder.Borders h)
     {
         hoverState = h;
@@ -146,7 +137,8 @@ public class zDraggable : MonoBehaviour,IProvideColors
 
         if (menuController == null) menuController = GetComponentInChildren<zDraggableMenuController>();
         if (menuController != null) menuController.setHeight(headerHeight);
-        if (colorsChanged != null) colorsChanged();
+if (colors!=null)
+        colors.OnChange.Invoke();
     }
 
     public void saveAllLocation()
@@ -238,18 +230,21 @@ public class zDraggable : MonoBehaviour,IProvideColors
                 }
 
             }
-            if (draggableMenu == null) draggableMenu = Resources.Load("zDraggableMenu") as GameObject;
-
-            if (draggableMenu != null)
+            if (addMenu)
             {
-                GameObject thisMenu = Instantiate(draggableMenu, frame.transform);
+                #pragma warning disable 162
+                if (draggableMenu == null) draggableMenu = Resources.Load("zDraggableMenu") as GameObject;
 
-                thisMenu.transform.SetParent(frame.transform);
-                thisMenu.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
-                menuController = thisMenu.GetComponent<zDraggableMenuController>();
+                if (draggableMenu != null)
+                {
+                    GameObject thisMenu = Instantiate(draggableMenu, frame.transform);
 
+                    thisMenu.transform.SetParent(frame.transform);
+                    thisMenu.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
+                    menuController = thisMenu.GetComponent<zDraggableMenuController>();
+
+                }
             }
-            else Debug.Log("no menu");
 
         }
         for (int i = 0; i < numBorders; i++)
@@ -559,7 +554,6 @@ public class zDraggable : MonoBehaviour,IProvideColors
         return (2 - f) * (2 - f) * f;
     }
 
-
     public void moveRelative(Vector3 relPos)
     {
         Vector3 t = rect.localPosition;
@@ -581,25 +575,6 @@ public class zDraggable : MonoBehaviour,IProvideColors
             rect.localPosition = newPos;
         }
         rect.GetWorldCorners(corners);
-        findMatchingEdges();
-    }
-
-    void findMatchingEdges()
-    {
-        /*
-                Vector2 TL = corners[1];
-                Vector2 TR = corners[2];
-        //        zDraggable close;
-                for (int i = 0; i < draggableList.Count; i++)
-                {
-                    zDraggable d = draggableList[i];
-                    if (d == this) continue;
-                    Vector3 BL = d.corners[0];
-                    Vector3 BR = d.corners[3];
-
-               //     Debug.Log("distance between " + name + " and " + d.name + " is vertical " + (BL.y - TL.y) + " h1 = " + (TL.x - BL.x) + " h2" + (TR.x - BR.x));
-
-                }*/
     }
 
     private void Update()
@@ -611,8 +586,6 @@ public class zDraggable : MonoBehaviour,IProvideColors
             Debug.Log(k);
             setDimensions((1 - k) * minimalSize + savedSize * k);
         }
-        //    if (Input.GetKeyDown("s")) saveLocation();
-        //     if (Input.GetKeyDown("l")) loadLocation();
     }
 
 }

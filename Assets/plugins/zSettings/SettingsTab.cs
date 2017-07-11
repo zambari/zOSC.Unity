@@ -52,11 +52,10 @@ if (!quit)
             if (text==null) Debug.Log("no text",gameObject); else
         text.text = n;
     }
-    protected override void Awake()
+    protected  void Awake()
     {
-        base.Awake();
+
         if (settingsPanel == null) settingsPanel = GetComponentInParent<zSettings>();
-        if (text == null) text = GetComponentInChildren<Text>();
         if (button == null) button = GetComponent<Button>();
 
     }
