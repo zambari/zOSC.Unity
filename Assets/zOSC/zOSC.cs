@@ -69,7 +69,6 @@ public partial class zOSC : MonoBehaviour
 
     // public static OSCRouter replyRouter;
     // public List<string> bindAddresses;
-    [HideInInspector] List<string> routerList = new List<string>();
     OSCClient client;
     // static bool isCurrentPacketFromLoopback;
     void OnValidate()

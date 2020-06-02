@@ -218,7 +218,6 @@ public partial class zOSC : MonoBehaviour
     {
         if (routers == null) routers = new List<OSCRouter>();
         routers.Add(router);
-        routerList.Add(router.baseAddress);
     }
 
     /* */
