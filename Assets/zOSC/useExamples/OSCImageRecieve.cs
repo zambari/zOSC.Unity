@@ -47,9 +47,9 @@ public class OSCImageRecieve : OSCBindBasic
     {
         zOSC.Bind(this,lastAddress,OnBlob );
     }
-    void Start()
+   protected override void Start()
     {
-        OSCBind();
+        base.Start();
         rawImage = GetComponent<RawImage>();
         if (GetSettings)
         {

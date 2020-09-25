@@ -53,7 +53,11 @@ public partial class zOSC : MonoBehaviour
     {
         mainRouter.bindGeneric(requester, addr, listener);
     }
-    public static void Bind(MonoBehaviour requester, string addr, Action<Vector2> listener)
+    // public static void BindVector3(MonoBehaviour requester, string addr, Action<Vector3> listener)
+    // {
+    //     mainRouter.bindGeneric(requester, addr, listener);
+    // }
+    public static void BindVector2(MonoBehaviour requester, string addr, Action<Vector2> listener)
     {
         mainRouter.bindGeneric(requester, addr, listener);
     }
@@ -81,7 +85,7 @@ public partial class zOSC : MonoBehaviour
     }
 
     [Obsolete("Please use new parameter order: Monobehaviour, address, method")]
-    public static void Bind(MonoBehaviour requester, object o, string addr)
+    public static void Bind(MonoBehaviour requester,string addr, object o)
     {
         throw new System.NotImplementedException("Parameter order has changed since zOSC 1.1, pleas update your code");
     }

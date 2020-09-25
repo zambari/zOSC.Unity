@@ -43,19 +43,7 @@ public class OSCImageSend : OSCBindBasic
     {
         sendNow = true;
     }
-    void Start()
-    {
-
-       // SettingsButton t = zSettings.addButton("send Image", "IMG");
-    //    SettingsSlider s = zSettings.addSlider("quality", "IMG");
-    //    t.valueChanged += sendn;
-      //  s.valueChanged += setQuality;
-
-        // zOSC.bind(this,setResX,"/img/setResX");
-        // zOSC.bind(this,setResY,"/img/setResY" );
-        // zOSC.bind(this,setQual,"/img/setQual" );
-        // zOSC.bind(this,setUpdate,"/img/updateFreq" );
-    }
+  
     void setQuality(float f)
     {
         quality = (int)(f);

@@ -294,7 +294,7 @@ namespace Z.OSC
             Debug.Log("null packet address"); return false;
         }
         //        Debug.Log(baseAddressLen + " " + packet.Address);
-        try
+      //  try
         {
             string address = packet.Address.Substring(baseAddressLen);
 
@@ -311,20 +311,21 @@ namespace Z.OSC
             Binding listener;
             if (oscBinding.TryGetValue(address, out listener))
             {
-                try
-                {
-                    return UseBinding(listener, packet);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError("Error using binding " + e.Message);
-                    if (listener.requester != null)
-                        Debug.LogError("Binding info: " + address + " Monobehaviour: " + listener.requester.GetType().ToString() + " on gameobject " + listener.requester.name + " " + listener.objectType.ToString() + " " + listener.bindMethod.GetType().ToString());
-                }
+                return UseBinding(listener, packet);
+                // try
+                // {
+                //     return UseBinding(listener, packet);
+                // }
+                // catch (Exception e)
+                // {
+                //     Debug.LogError("Error using binding " + e.Message);
+                //     if (listener.requester != null)
+                //         Debug.LogError("Binding info: " + address + " Monobehaviour: " + listener.requester.GetType().ToString() + " on gameobject " + listener.requester.name + " " + listener.objectType.ToString() + " " + listener.bindMethod.GetType().ToString());
+                // }
             }
 
         }
-        catch (Exception e) { Debug.LogError("invalid string " + e.Message); }
+      //  catch (Exception e) { Debug.LogError("invalid string " + e.Message); }
         return true;
     }
 

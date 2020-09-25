@@ -25,7 +25,9 @@ public class IPDisplay : MonoBehaviour
     void GetIPS()
     {
         string strHostName = Dns.GetHostName();
+        #pragma warning disable 618
         IPHostEntry iphostentry = Dns.GetHostByName(strHostName);
+        #pragma warning restore 618
         foreach (IPAddress ipaddress in iphostentry.AddressList)
         {
             if (ipaddress.GetAddressBytes().Length == 4)

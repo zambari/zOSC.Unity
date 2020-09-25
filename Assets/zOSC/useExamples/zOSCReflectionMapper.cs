@@ -89,9 +89,6 @@ public class zOSCReflectionMapper : OSCBindBasic
     {
         zOSC.Unbind(OSCAddress);
     }
-    void Start()
-    {
-        OSCBind();
-    }
+
 
 }

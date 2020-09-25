@@ -18,6 +18,7 @@ using Z.OSC;
 // v 1.3 position and rotation in one packe3t
 // v 1.4 merged zambox branch with terma branch
 // v.2.0 new api, lots of improvements
+// v.2.1 getters setters for loopback
 
 public partial class zOSC : MonoBehaviour
 {
@@ -28,7 +29,9 @@ public partial class zOSC : MonoBehaviour
     public int targetPort = 9988;
 
     [Header("Loopback")]
-    public bool localEcho = true;
+    [SerializeField]
+     bool _localEcho = true;
+    public bool localEcho {get {return _localEcho;} set {_localEcho=value;}}
     ServerLog localListener;
     int listenPort = 9988;
     List<ClientLog> OSCRecievers;
@@ -56,7 +59,7 @@ public partial class zOSC : MonoBehaviour
     [ReadOnly]
     public int TotalBytesRecieved;
     static bool warningDisplated;
-    bool recieverIsLocal;
+    // bool recieverIsLocal;
     Queue<OSCPacket> recievePacketQueue;
 
     // List<AckRequest> sentAckRequests;
@@ -116,11 +119,12 @@ public partial class zOSC : MonoBehaviour
         try
         {
             // if (!isCurrentPacketFromLoopback)
-            if (OnOSCRecieve != null) OnOSCRecieve.Invoke();
-            else
-            {
-                Debug.Log("external");
-            }
+            if (OnOSCRecieve != null) 
+                OnOSCRecieve.Invoke();
+            // else
+            // {
+            //     // Debug.Log("external");
+            // }
             //if (OnOSCRecieveLo != null) OnOSCRecieve.Invoke();
 
         }
@@ -142,13 +146,14 @@ public partial class zOSC : MonoBehaviour
             listBindAdresses(packet.Address.Substring(0, packet.Address.Length - 1));
             return;
         }
-        if (routers.Count == 0) Debug.Log("no routers");
+        if (routers.Count == 0)
+             Debug.Log("no routers");
         while (i < routers.Count)
         {
             if (packet.Address.StartsWith(routers[i].baseAddress))
             {
                 // Debug.Log("potential");
-                try
+            //    try
                 {
                     if (routers[i].ParsePacket(packet))
                     {
@@ -158,11 +163,11 @@ public partial class zOSC : MonoBehaviour
                     else
                         Debug.Log("no router reacted to " + packet.Address);
                 }
-                catch (Exception e)
-                {
-                    Debug.Log("Exception while parsing router " + i + " [" + routers[i].baseAddress + "]  packet " + packet.Address + " triggered exception " + e.Message);
+                // catch (Exception e)
+                // {
+                //     Debug.Log("Exception while parsing router " + i + " [" + routers[i].baseAddress + "]  packet " + packet.Address + " triggered exception " + e.Message);
 
-                }
+                // }
             }
             i++;
         }
@@ -181,10 +186,10 @@ public partial class zOSC : MonoBehaviour
     public static bool SetTarget(string addr, int portNr)
     {
         if (_instance.client != null) _instance.client.Close();
-        if (addr == "127.0.0.1" && portNr == instance.listenPort)
-            _instance.recieverIsLocal = true;
-        else
-            _instance.recieverIsLocal = false;
+        // if (addr == "127.0.0.1" && portNr == instance.listenPort)
+        //     _instance.recieverIsLocal = true;
+        // else
+        //     _instance.recieverIsLocal = false;
 
         if (_instance.logToConsole)
             Debug.Log("zOSC target : " + addr + " : " + portNr);
@@ -207,6 +212,12 @@ public partial class zOSC : MonoBehaviour
         instance.listenPort = port;
         instance.defaultRecievePort = port;
         return instance.RestartLocalServer();
+    }
+    public bool SetRecievelPort(int port)
+    {
+        listenPort = port;
+        defaultRecievePort = port;
+        return RestartLocalServer();
     }
 
     IEnumerator Start()

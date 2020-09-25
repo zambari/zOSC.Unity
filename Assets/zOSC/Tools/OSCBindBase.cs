@@ -28,18 +28,22 @@ public class OSCBindBasic : MonoBehaviour
             OSCUnbind();
         }
 
-       // Invoke("_bind", 0.1f);
+        // Invoke("_bind", 0.1f);
     }
 
-    void OnDisable()
+    protected virtual void OnDisable()
     {
         OSCUnbind();
     }
-    void OnEnable()
+    protected virtual void OnEnable()
+    {
+        if (Time.time > 1)
+            OSCBind();
+    }
+    protected virtual void Start()
     {
         OSCBind();
     }
-
     void _bind()
     {
         if (!gameObject.activeInHierarchy) return;

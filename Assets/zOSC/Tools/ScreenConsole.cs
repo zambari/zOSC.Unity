@@ -8,16 +8,19 @@ using UnityEngine.UI;
 // v.04 // new fades
 // v.05 // back to manual line count
 // v.06 // clear made public
+// v.07  more ini
+// v.08 replace newline with space, will it fix formatitng?
 
 namespace Z
 {
 
     [RequireComponent(typeof(Text))]
-    public class ScreenConsole : MonoBehaviour//, IRequestInitEarly
+    public class ScreenConsole : MonoBehaviour
     {
         Text text;
         public Color color = Color.white;
-        public bool useFades = true;
+        public static bool useFades { get { if (instance != null) return instance._useFades; return true; } }
+        public bool _useFades = true;
         public static ScreenConsole instance;
         static List<string> logList;
         // public List<string> logList2; //temp
@@ -31,7 +34,7 @@ namespace Z
         [Header("Affects performance")]
         public float refreshTime = 0.1f;
         WaitForSeconds waiter;
-        public int maxlinecharacterCount = 100;
+        public int maxlinecharacterCount = 200;
         public bool captureMainLog = true;
         public bool captureMainErrors = true;
         public bool captureMainExceptions = true;
@@ -69,7 +72,7 @@ namespace Z
         void OnValidate()
         {
             if (text == null) text = GetComponent<Text>();
-            //    text.supportRichText = useFades;
+            text.supportRichText = useFades;
             text.color = color;
             waiter = new WaitForSeconds(refreshTime);
             string temp = "Log:";
@@ -77,25 +80,7 @@ namespace Z
             temp += "---\n";
             text.text = temp;
         }
-        void PrintSomeRubbih()
-        {
-            if (Application.isPlaying)
-                StartCoroutine(RubbishPrinter());
-        }
-        void PrintMoreubbih()
-        {
-            if (Application.isPlaying)
-                StartCoroutine(RubbishPrinter(40, 10, 50, 5, 30));
-        }
-        void Logerrors()
-        {
-            Debug.LogError("error");
-        }
-        IEnumerator RubbishPrinter(int count = 20, int wordMin = 5, int wordMax = 15, int wordCountMin = 1, int wordCountMax = 10)
-        {
-         
-                yield return null;
-        }
+
         bool wasInit;
         bool antiFeedback;
 
@@ -103,6 +88,7 @@ namespace Z
         {
             if (wasInit) return;
             wasInit = true;
+            Application.logMessageReceived -= HandleLog;
             Application.logMessageReceived += HandleLog;
         }
         void OnEnable()
@@ -112,19 +98,20 @@ namespace Z
         }
         void OnDisable()
         {
-            //  Application.logMessageReceived -= HandleLog;
+            Application.logMessageReceived -= HandleLog;
         }
 
-        void HandleLog(string logString, string stackTrace, LogType type)
+        static void HandleLog(string logString, string stackTrace, LogType type)
         {
-            if (antiFeedback) return;
-            if (type == LogType.Log && captureMainLog)
+            if (instance != null && instance.antiFeedback) return;
+            logString = logString.Replace('\n', ' ');
+            if (type == LogType.Log && (instance == null || instance.captureMainLog))
                 Log(logString);
             else
-            if (type == LogType.Error && captureMainErrors)
+            if (type == LogType.Error && (instance == null || instance.captureMainErrors))
                 Log(useFades ? "<color=#ff0000>" + logString + "</color>" : logString);
             else
-            if (type == LogType.Exception && captureMainExceptions)
+            if (type == LogType.Exception && (instance == null || instance.captureMainExceptions))
                 Log(useFades ? "<color=#ff2020>" + logString + "</color>" : logString);
         }
 
@@ -160,7 +147,6 @@ namespace Z
                 antiFeedback = false;
             }
         }
-
 
         IEnumerator Rebuilder()
         {
@@ -213,7 +199,6 @@ namespace Z
                                 sb.Append(logList[i]);
                         }
 
-
                         sb.Append("\n");
                     }
                     text.text = sb.ToString();
@@ -234,7 +219,6 @@ namespace Z
             Clear();
             StartCoroutine(Rebuilder());
         }
-
 
         void Reset()
         {

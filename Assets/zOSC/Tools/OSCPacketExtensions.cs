@@ -197,6 +197,10 @@ namespace Z.OSC
         public static bool GetQuaternion(this OSCPacket packet, out Quaternion q)
         {
             q = Quaternion.identity;
+            if (packet.typeTag.Length<=4)
+            {
+                Debug.Log("this packet has too short typetag "+packet.typeTag);
+            }
             if (packet.typeTag[1] != 'f' ||
                packet.typeTag[2] != 'f' ||
                packet.typeTag[3] != 'f' ||

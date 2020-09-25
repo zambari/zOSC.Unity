@@ -13,15 +13,24 @@ public partial class zOSC : MonoBehaviour
     {
 
         zOSC.lastSent = message;
-        if (_instance == null && !warningDisplated) { warningDisplated = true; Debug.LogWarning("Please add zOSC to your scene first"); return false; }
+        if (_instance == null)
+        {
+            if (!warningDisplated)
+            {
+                warningDisplated = true;
+                Debug.LogError("Please add zOSC to your scene first");
+            }
+
+            return false;
+        }
         if (_instance.client != null)
         {
             if (_instance.logToConsole && _instance.logSends)
             {
                 if (!_instance.detailedLog)
-                LogSend(message.Address + " " + message.typeTag);
+                    LogSend(message.Address + " " + message.typeTag);
                 else
-              LogSend(message.Address + " " + message.typeTag+"    binary: "+message.BinaryData.ByteArrayToStringAsHex());
+                    LogSend(message.Address + " " + message.typeTag + "    binary: " + message.BinaryData.ByteArrayToStringAsHex());
             }
 
             _instance.client.Send(message);
@@ -30,24 +39,24 @@ public partial class zOSC : MonoBehaviour
             if (OnOSCTransmit != null) OnOSCTransmit();
         }
         else Debug.Log("no client " + message.Address);
-        try
+    //    try
         {
             if (_instance.localEcho)
             {
-             // if (OnOSCTransmitLocal != null && !realsend) 
-                 //OnOSCTransmitLocal();
-                 //isCurrentPacketFromLoopback=true;
+                // if (OnOSCTransmitLocal != null && !realsend) 
+                //OnOSCTransmitLocal();
+                //isCurrentPacketFromLoopback=true;
                 // if (!_instance.recieverIsLocal)
-                    _instance.ReactToPacket(message);                   // dogfeeding our message
+                _instance.ReactToPacket(message);                   // dogfeeding our message
                 //     isCurrentPacketFromLoopback=false;
             }
             return true;
         }
-        catch (Exception e)
-        {
-            Debug.Log("Error broadcasting OSC to local listenerd (not through network!) " + e.Message);
-            return false;
-        }
+        // catch (Exception e)
+        // {
+        //     Debug.Log("Error broadcasting OSC to local listenerd (not through network!) " + e.Message);
+        //     return false;
+        // }
 
     }
 
