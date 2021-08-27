@@ -19,19 +19,32 @@ using Z.OSC;
 // v 1.4 merged zambox branch with terma branch
 // v.2.0 new api, lots of improvements
 // v.2.1 getters setters for loopback
+// v.2.2 getters setters for targets
 
 public partial class zOSC : MonoBehaviour
 {
+
+
     [Header("Reciever@localhost")]
-    public int defaultRecievePort = 8899;
+
+    [SerializeField]
+    int _defaultRecievePort = 8899;
+    public int defaultRecievePort { get { return _defaultRecievePort; } set { _defaultRecievePort = value; } }
+
+    public string targetAddr { get { return _targetAddr; } set { _targetAddr = value; } }
+
     [Header("Sender")]
-    public string targetAddr = "127.0.0.1";
-    public int targetPort = 9988;
+    [SerializeField]
+    public string _targetAddr = "127.0.0.1";
+
+    [SerializeField]
+    int _targetPort = 9988;
+    public int targetPort { get { return _targetPort; } set { _targetPort = value; } }
 
     [Header("Loopback")]
     [SerializeField]
-     bool _localEcho = true;
-    public bool localEcho {get {return _localEcho;} set {_localEcho=value;}}
+    bool _localEcho = true;
+    public bool localEcho { get { return _localEcho; } set { _localEcho = value; } }
     ServerLog localListener;
     int listenPort = 9988;
     List<ClientLog> OSCRecievers;
@@ -119,7 +132,7 @@ public partial class zOSC : MonoBehaviour
         try
         {
             // if (!isCurrentPacketFromLoopback)
-            if (OnOSCRecieve != null) 
+            if (OnOSCRecieve != null)
                 OnOSCRecieve.Invoke();
             // else
             // {
@@ -147,13 +160,13 @@ public partial class zOSC : MonoBehaviour
             return;
         }
         if (routers.Count == 0)
-             Debug.Log("no routers");
+            Debug.Log("no routers");
         while (i < routers.Count)
         {
             if (packet.Address.StartsWith(routers[i].baseAddress))
             {
                 // Debug.Log("potential");
-            //    try
+                //    try
                 {
                     if (routers[i].ParsePacket(packet))
                     {
